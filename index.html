@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A simple, premium Glassmorphic English Language Learning Application built with Vanilla JS and synced with Supabase.">
+    <title>AetherLingo - Glassmorphic English Learning</title>
+    
+    <!-- Link Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Ambient Mesh Gradient Spheres (For Glassmorphic depth) -->
+    <div class="bg-spheres">
+        <div class="sphere sphere-1"></div>
+        <div class="sphere sphere-2"></div>
+        <div class="sphere sphere-3"></div>
+    </div>
+
+    <!-- Celebration Confetti Layer -->
+    <canvas id="confetti-canvas"></canvas>
+
+    <!-- Main Container -->
+    <div class="app-container">
+
+        <!-- ====================================================================
+             1. SCREEN: DATABASE SETUP / CONNECTION
+             ==================================================================== -->
+        <section id="screen-config" class="screen active">
+            <div class="glass-card config-form">
+                <div class="config-header">
+                    <h2>Connect Supabase</h2>
+                    <p>Enter your database details to sync progress and profiles in real-time.</p>
+                </div>
+                
+                <form id="config-form">
+                    <div class="input-group">
+                        <label for="db-url-input">Supabase Project URL</label>
+                        <input type="url" id="db-url-input" required placeholder="https://your-project.supabase.co">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="db-key-input">Supabase Anon Key</label>
+                        <input type="password" id="db-key-input" required placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...">
+                    </div>
+                    
+                    <div style="margin-top: 10px; font-size: 0.8rem; color: var(--text-secondary); line-height: 1.4;">
+                        <strong>Quick Note:</strong> Ensure you have run the database setup script in your Supabase SQL Editor. You can find the script inside <a href="schema.sql" style="color: var(--neon-blue); text-decoration: none;" target="_blank">schema.sql</a> in the project directory.
+                    </div>
+                    
+                    <button type="submit" class="btn-glowing">
+                        <span>Initialize Connection</span> ✨
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ====================================================================
+             2. SCREEN: PROFILE SELECTION
+             ==================================================================== -->
+        <section id="screen-profiles" class="screen">
+            <div class="profile-screen-container">
+                <div class="welcome-title">
+                    <h1>Who is learning today?</h1>
+                    <p>Select your profile to load personalized progress</p>
+                </div>
+                
+                <div id="profiles-list" class="profiles-grid">
+                    <!-- Dynamic Profile Cards go here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ====================================================================
+             3. SCREEN: DASHBOARD
+             ==================================================================== -->
+        <section id="screen-dashboard" class="screen">
+            <!-- Header bar -->
+            <header class="dashboard-header">
+                <div class="dashboard-user">
+                    <div id="user-avatar-sm" class="user-avatar-sm">👩‍🎓</div>
+                    <div class="user-info-sm">
+                        <h3 id="user-name-sm">Emma</h3>
+                        <p>Student Profile</p>
+                    </div>
+                </div>
+                <div class="stats-pill">
+                    ⚡ <span id="header-xp-val" class="xp-num">0</span> XP
+                </div>
+            </header>
+
+            <div class="dashboard-title">
+                <h2>English Curriculum</h2>
+            </div>
+
+            <!-- Curriculum Syllabus List -->
+            <main id="lessons-container" class="lessons-list">
+                <!-- Dynamic Lesson Cards (Basics, routines, restaurant) go here -->
+            </main>
+
+            <footer class="logout-btn-box">
+                <button id="btn-logout" class="btn-secondary">Disconnect Database 🔒</button>
+            </footer>
+        </section>
+
+        <!-- ====================================================================
+             4. SCREEN: LESSON ARENA
+             ==================================================================== -->
+        <section id="screen-arena" class="screen">
+            <!-- Navigation -->
+            <header class="lesson-navbar">
+                <button id="btn-back-dashboard" class="btn-close" aria-label="Exit Lesson">✕</button>
+                <div class="bar-container">
+                    <div id="bar-fill" class="bar-fill"></div>
+                </div>
+                <button id="btn-speak" class="speaker-btn" aria-label="Listen Pronunciation">
+                    🔊 <span>Listen</span>
+                </button>
+            </header>
+
+            <!-- Quiz Card -->
+            <main class="arena-card glass-card" id="arena-content-card">
+                <!-- Dynamic Interactive Engines (MCQ, Fill blank, Order) go here -->
+            </main>
+
+            <!-- Feedback Overlay -->
+            <div id="result-banner" class="result-banner">
+                <div id="result-icon" class="result-icon">✨</div>
+                <div class="result-text">
+                    <h4 id="result-banner-title">Excellent!</h4>
+                    <p id="result-banner-desc">Correct answer description.</p>
+                </div>
+            </div>
+
+            <!-- Bottom Action Button -->
+            <footer class="feedback-box">
+                <button id="btn-check" class="btn-check disabled">Check Answer</button>
+            </footer>
+        </section>
+
+        <!-- ====================================================================
+             5. SCREEN: SUCCESS / COMPLETION
+             ==================================================================== -->
+        <section id="screen-success" class="screen">
+            <div class="success-screen-box">
+                <div class="success-badge">🏆</div>
+                
+                <div class="success-header">
+                    <h2 id="success-lesson-name">Lesson Completed!</h2>
+                    <p>You did an incredible job. Keep going!</p>
+                </div>
+                
+                <div class="results-stats-row">
+                    <div class="stat-box glass-card xp-stat">
+                        <div id="success-xp-earned" class="stat-val">+35</div>
+                        <div class="stat-label">XP Earned</div>
+                    </div>
+                    
+                    <div class="stat-box glass-card accuracy-stat">
+                        <div id="success-accuracy" class="stat-val">100%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+                
+                <button id="btn-success-continue" class="btn-glowing" style="width: 100%; margin-top: 15px;">
+                    Continue to Dashboard 🚀
+                </button>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Official Supabase JavaScript CDN Package -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Application Logic Controller -->
+    <script src="app.js"></script>
+</body>
+</html>
