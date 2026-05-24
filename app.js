@@ -254,13 +254,24 @@ function showScreen(screenId) {
 // --- 6. SUPABASE SYSTEM SYNC ---
 function initSupabase() {
     try {
-        if (!window.supabase) {
-            console.error("Supabase script CDN did not load correctly.");
+        // The UMD bundle exposes: window.supabase = { createClient: fn }
+        // Some CDN builds also nest it: window.supabase.supabase.createClient
+        let clientFactory = null;
+
+        if (window.supabase && typeof window.supabase.createClient === 'function') {
+            clientFactory = window.supabase.createClient;
+        } else if (window.supabase && window.supabase.supabase && typeof window.supabase.supabase.createClient === 'function') {
+            clientFactory = window.supabase.supabase.createClient;
+        }
+
+        if (!clientFactory) {
+            console.error("Supabase script CDN did not load correctly. window.supabase =", window.supabase);
+            alert("Supabase library failed to load. Please check your internet connection and refresh the page.");
             showScreen("screen-config");
             return;
         }
         
-        supabase = window.supabase.createClient(dbUrl, dbKey);
+        supabase = clientFactory(dbUrl, dbKey);
         
         // Cache credentials
         localStorage.setItem("supabase_url", dbUrl);
@@ -269,7 +280,7 @@ function initSupabase() {
         loadProfiles();
     } catch (err) {
         console.error("Supabase config error: ", err);
-        alert("Connection parameters failed. Please verify credentials.");
+        alert("Connection failed: " + err.message + "\n\nPlease verify your Supabase URL and Anon Key.");
         showScreen("screen-config");
     }
 }
@@ -324,7 +335,7 @@ async function loadProfiles() {
         renderProfilesGrid();
     } catch (err) {
         console.error("Fetch profiles failed: ", err);
-        alert("Database connection failed. Please ensure schema tables are created in Supabase SQL editor.\n\nError: " + err.message);
+        alert("Database connection failed. Please ensure you have:\n\n1. Run the schema.sql script in the Supabase SQL Editor\n2. Entered the correct Supabase URL and Anon Key\n\nError: " + err.message);
         showScreen("screen-config");
     }
 }
